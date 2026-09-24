@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,7 +16,7 @@ import { AuthStore } from '../../../core/store/auth.store';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule,
+    RouterLink,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -28,27 +28,26 @@ import { AuthStore } from '../../../core/store/auth.store';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
   readonly authStore = inject(AuthStore);
+  readonly hidePassword = signal(true);
+  readonly rememberMe = signal(true);
 
-  loginForm = this.fb.group({
+  readonly loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    rememberMe: [false]
+    password: ['', [Validators.required]]
   });
 
-  async onSubmit() {
-    if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
-      await this.authStore.login({ 
-        email: email!, 
-        password: password! 
-      });
-      
-      if (this.authStore.isAuthenticated()) {
-        this.router.navigate(['/dashboard']);
-      }
+  async onSubmit(): Promise<void> {
+    if (this.loginForm.invalid) {
+      return;
+    }
+
+    await this.authStore.login(this.loginForm.getRawValue() as { email: string; password: string });
+
+    if (this.authStore.isAuthenticated()) {
+      await this.router.navigate(['/dashboard']);
     }
   }
 }

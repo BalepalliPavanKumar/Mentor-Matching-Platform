@@ -4,5 +4,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ApiService {
-  readonly baseUrl = 'http://localhost:8080'; // API Gateway
+  readonly baseUrl = 'http://localhost:8080';
+
+  endpoint(path: string): string {
+    return `${this.baseUrl}${path}`;
+  }
 }

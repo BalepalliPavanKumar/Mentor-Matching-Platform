@@ -1,50 +1,298 @@
-/* Global Styles & Design Tokens */
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
-
 :root {
-  --primary: #e71e30; // SkillSync Red
-  --primary-dark: #cc1a2a;
-  --secondary: #0b1120; // Deep Navy
-  --bg-light: #f4f7fa;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --glass: rgba(255, 255, 255, 0.7);
+  --primary: #dc2626;
+  --primary-hover: #b91c1c;
+  --primary-soft: #fee2e2;
+  --accent-orange: #f97316;
+  --ink: #0f172a;
+  --ink-sidebar: #1e2942;
+  --ink-sidebar-hover: #2a3752;
+  --canvas: #f1f5f9;
+  --paper: #ffffff;
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --gold: #fbbf24;
+}
+
+html {
+  color-scheme: light;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: var(--bg-light);
-  color: var(--text-main);
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
 }
 
-// Material Theme Overrides
-.mat-mdc-button.mat-unthemed {
-    --mdc-filled-button-container-color: var(--primary);
+* {
+  box-sizing: border-box;
 }
 
-.mat-mdc-flat-button {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Space Grotesk', 'Manrope', sans-serif;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+/* ---------- Shared primitives ---------- */
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 28px rgba(15, 23, 42, 0.05);
+}
+
+.avatar-circle {
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.stat-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+
+  .stat-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  .stat-label {
+    color: var(--muted);
+    font-size: 0.86rem;
+    margin-top: 4px;
+  }
+
+  .stat-detail {
+    margin-top: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--success);
+  }
+
+  .stat-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
     height: 48px;
-    border-radius: 8px !important;
+    border-radius: 12px;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
 }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.badge-success {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.badge-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.badge-neutral {
+  background: #f1f5f9;
+  color: var(--muted);
+}
+
+.chip-skill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--gold);
+  font-size: 0.86rem;
+  font-weight: 700;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .rating-count {
+    color: var(--muted);
+    font-weight: 500;
+  }
+}
+
+.btn-primary-pill {
+  border-radius: 999px !important;
+}
+
+.eyebrow {
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* ---------- Angular Material overrides ---------- */
 
 .mat-mdc-form-field {
-    width: 100%;
-}
-
-.mat-mdc-text-field-wrapper {
-    background-color: white !important;
-}
-
-// Helper classes
-.full-width {
   width: 100%;
 }
 
-.glass-card {
-  background: var(--glass);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+.mat-mdc-text-field-wrapper {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+  border-color: var(--border) !important;
+}
+
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--primary) !important;
+}
+
+.mat-mdc-card {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 28px rgba(15, 23, 42, 0.05) !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border);
+}
+
+.mat-mdc-unelevated-button.mat-primary,
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-fab.mat-primary,
+.mat-mdc-mini-fab.mat-primary {
+  --mdc-filled-button-container-color: var(--primary);
+  --mdc-filled-button-label-text-color: #fff;
+  --mdc-fab-container-color: var(--primary);
+}
+
+.mat-mdc-unelevated-button.mat-primary:hover,
+.mat-mdc-raised-button.mat-primary:hover {
+  --mdc-filled-button-container-color: var(--primary-hover);
+}
+
+.mat-mdc-outlined-button:not(:disabled) {
+  --mdc-outlined-button-outline-color: var(--border);
+  --mdc-outlined-button-label-text-color: var(--ink);
+}
+
+.mat-mdc-outlined-button.mat-primary:not(:disabled) {
+  --mdc-outlined-button-outline-color: var(--primary);
+  --mdc-outlined-button-label-text-color: var(--primary);
+}
+
+.mat-mdc-button.mat-primary,
+.mat-mdc-icon-button.mat-primary {
+  --mat-text-button-label-text-color: var(--primary);
+  --mdc-icon-button-icon-color: var(--primary);
+}
+
+.mat-mdc-button-base {
+  border-radius: 10px !important;
+}
+
+.mat-mdc-checkbox .mdc-checkbox__background {
+  border-color: var(--muted) !important;
+}
+
+.mat-mdc-checkbox.mat-primary {
+  --mdc-checkbox-selected-checkmark-color: #fff;
+  --mdc-checkbox-selected-focus-icon-color: var(--primary);
+  --mdc-checkbox-selected-hover-icon-color: var(--primary);
+  --mdc-checkbox-selected-icon-color: var(--primary);
+  --mdc-checkbox-selected-pressed-icon-color: var(--primary);
+}
+
+.mat-mdc-chip.mat-mdc-standard-chip {
+  --mdc-chip-elevated-container-color: #f1f5f9;
+  --mdc-chip-label-text-color: #334155;
+}
+
+.mat-mdc-tab-group,
+.mat-mdc-tab-nav-bar {
+  --mdc-tab-indicator-active-indicator-color: var(--primary);
+  --mat-tab-header-active-label-text-color: var(--primary);
+  --mat-tab-header-active-ripple-color: var(--primary);
+  --mat-tab-header-inactive-label-text-color: var(--muted);
+}
+
+.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color: var(--ink);
+}
+
+.mat-step-header .mat-step-icon-selected,
+.mat-step-header .mat-step-icon-state-edit,
+.mat-step-header .mat-step-icon-state-done {
+  background-color: var(--primary) !important;
+}
+
+.mat-step-header .mat-step-label.mat-step-label-active {
+  color: var(--ink) !important;
+  font-weight: 700;
+}
+
+.mat-calendar {
+  --mat-datepicker-calendar-date-selected-state-background-color: var(--primary);
+  --mat-datepicker-calendar-date-today-outline-color: var(--primary);
+  --mat-datepicker-calendar-date-focus-state-background-color: var(--primary-soft);
+  --mat-datepicker-calendar-date-hover-state-background-color: var(--primary-soft);
+}
+
+.mat-toolbar {
+  font-family: 'Manrope', sans-serif;
+}
+
+.mat-drawer-container {
+  background-color: transparent;
 }

@@ -1,0 +1,285 @@
+<section class="admin-page">
+  <header class="admin-header">
+    <div>
+      <h1>Admin Console</h1>
+      <span>Platform overview — {{ (nowDate) | date:'EEEE, MMMM d, y' }}</span>
+    </div>
+  </header>
+
+  <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+  <div class="stats-grid">
+    <mat-card class="card stat-card" *ngFor="let kpi of kpis()">
+      <div>
+        <div class="stat-value">{{ kpi.value }}</div>
+        <div class="stat-label">{{ kpi.label }}</div>
+        <div class="stat-detail">↑ {{ kpi.detail }}</div>
+      </div>
+      <span class="stat-icon" [class]="'tone-' + kpi.tone">
+        <mat-icon>{{ kpi.icon }}</mat-icon>
+      </span>
+    </mat-card>
+  </div>
+
+  <div class="console-grid">
+    <mat-card class="card panel wide">
+      <div class="panel-heading">
+        <h2>⏳ Pending Mentor Approvals</h2>
+        <a mat-button class="view-all">View all ({{ pendingMentors().length }}) →</a>
+      </div>
+
+      <div class="approval-list" *ngIf="pendingMentors().length; else noPending">
+        <article *ngFor="let mentor of pendingMentors(); let index = index" class="approval-row">
+          <span class="avatar-circle" [style.background]="avatarBg(mentor.name)">{{ initials(mentor.name) }}</span>
+          <div class="approval-info">
+            <strong>{{ mentor.name }}</strong>
+            <span class="muted">{{ mentor.bio || 'No bio provided' }}</span>
+            <div class="skills-row">
+              <span class="chip-skill" *ngFor="let skill of (mentor.skills || '').split(',')">{{ skill.trim() }}</span>
+            </div>
+          </div>
+          <span class="exp-col">{{ mentor.experience || '—' }}</span>
+          <div class="row-actions">
+            <button mat-flat-button class="approve-button" type="button" (click)="moderateMentor(mentor, 'approve')">
+              <mat-icon>check</mat-icon> Approve
+            </button>
+            <button mat-flat-button class="reject-button" type="button" (click)="moderateMentor(mentor, 'reject')">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </article>
+      </div>
+    </mat-card>
+
+    <mat-card class="card panel">
+      <div class="panel-heading">
+        <h2>🔔 Recent Activity</h2>
+      </div>
+
+      <div class="activity-list">
+        <article *ngFor="let item of recentActivity()" class="activity-item">
+          <span class="activity-icon" [class]="'activity-' + item.tone"><mat-icon>{{ item.icon }}</mat-icon></span>
+          <div>
+            <strong>{{ item.title }}</strong>
+            <span class="muted">{{ item.detail }}</span>
+          </div>
+        </article>
+        <p *ngIf="!recentActivity().length" class="empty-copy">No activity yet. New sessions, reviews, and approvals will appear here.</p>
+      </div>
+    </mat-card>
+
+    <mat-card class="card panel wide">
+      <div class="panel-heading">
+        <h2>📈 Platform Performance (last 30 days)</h2>
+      </div>
+
+      <div class="metric-bars">
+        <label>
+          <span>Session Completion Rate</span>
+          <strong>{{ completionRate() }}%</strong>
+          <mat-progress-bar mode="determinate" [value]="completionRate()"></mat-progress-bar>
+        </label>
+        <label>
+          <span>Mentor Satisfaction Score</span>
+          <strong>{{ satisfactionRate() }}%</strong>
+          <mat-progress-bar mode="determinate" color="accent" [value]="satisfactionRate()"></mat-progress-bar>
+        </label>
+        <label>
+          <span>Group Engagement Rate</span>
+          <strong>{{ engagementRate() }}%</strong>
+          <mat-progress-bar mode="determinate" [value]="engagementRate()"></mat-progress-bar>
+        </label>
+        <label>
+          <span>Learner Retention</span>
+          <strong>{{ retentionRate() }}%</strong>
+          <mat-progress-bar mode="determinate" color="warn" [value]="retentionRate()"></mat-progress-bar>
+        </label>
+      </div>
+    </mat-card>
+
+    <mat-card class="card panel">
+      <div class="panel-heading">
+        <h2>API Lookup</h2>
+      </div>
+
+      <form [formGroup]="lookupForm" class="compact-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Record type</mat-label>
+          <mat-select formControlName="kind">
+            <mat-option value="user">User profile</mat-option>
+            <mat-option value="mentor">Mentor</mat-option>
+            <mat-option value="skill">Skill</mat-option>
+            <mat-option value="session">Session</mat-option>
+            <mat-option value="group">Group</mat-option>
+            <mat-option value="review">Review</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>ID</mat-label>
+          <input matInput type="number" formControlName="id">
+        </mat-form-field>
+        <button mat-flat-button class="btn-primary-pill" type="button" (click)="runLookup()" [disabled]="lookupForm.invalid">
+          <mat-icon>search</mat-icon>
+          Fetch
+        </button>
+      </form>
+
+      <pre *ngIf="selectedLookup()">{{ lookupLabel() }}{{ selectedLookup() | json }}</pre>
+    </mat-card>
+  </div>
+
+  <div class="operations-grid">
+    <mat-card class="card panel">
+      <div class="panel-heading">
+        <h2>User Management</h2>
+        <button mat-stroked-button type="button" (click)="startNewUser()">New profile</button>
+      </div>
+
+      <div class="split-panel">
+        <div class="list-stack">
+          <button class="entity-button" type="button" *ngFor="let user of users()" (click)="selectUser(user)">
+            <span class="avatar-circle" [style.background]="avatarBg(user.name)">{{ initials(user.name) }}</span>
+            <span class="entity-text">
+              <strong>{{ user.name }}</strong>
+              <span class="muted">{{ user.email }} · {{ user.role }}</span>
+            </span>
+          </button>
+        </div>
+
+        <form [formGroup]="userForm" class="editor-form">
+          <mat-form-field appearance="outline"><mat-label>Auth/User ID</mat-label><input matInput type="number" formControlName="userId"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Name</mat-label><input matInput formControlName="name"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Email</mat-label><input matInput formControlName="email"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Phone</mat-label><input matInput formControlName="phone"></mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Role</mat-label>
+            <mat-select formControlName="role">
+              <mat-option value="ROLE_LEARNER">Learner</mat-option>
+              <mat-option value="ROLE_MENTOR">Mentor</mat-option>
+              <mat-option value="ROLE_ADMIN">Admin</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Skills</mat-label><input matInput formControlName="skills"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Profile image URL</mat-label><input matInput formControlName="profileImageUrl"></mat-form-field>
+          <button mat-flat-button class="btn-primary-pill" type="button" (click)="saveUser()" [disabled]="userForm.invalid">
+            <mat-icon>save</mat-icon>
+            Save profile
+          </button>
+        </form>
+      </div>
+    </mat-card>
+
+    <mat-card class="card panel">
+      <div class="panel-heading">
+        <h2>Skill Catalog</h2>
+      </div>
+
+      <form [formGroup]="skillForm" class="compact-form">
+        <mat-form-field appearance="outline"><mat-label>Skill name</mat-label><input matInput formControlName="name"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Category</mat-label><input matInput formControlName="category"></mat-form-field>
+        <button mat-flat-button class="btn-primary-pill" type="button" (click)="createSkill()" [disabled]="skillForm.invalid">
+          <mat-icon>add</mat-icon>
+          Add skill
+        </button>
+      </form>
+
+      <div class="chip-cloud">
+        <span class="chip-skill" *ngFor="let skill of skills()">{{ skill.name }} · {{ skill.category }}</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="card panel">
+      <div class="panel-heading">
+        <h2>All Sessions</h2>
+      </div>
+
+      <div class="session-list">
+        <article *ngFor="let session of allSessions()" class="session-row">
+          <div>
+            <strong>Session #{{ session.id }}</strong>
+            <span class="muted">{{ session.sessionDate | date: 'medium' }}</span>
+            <small class="muted">Mentor {{ session.mentorId }} · Learner {{ session.learnerId }}</small>
+          </div>
+          <span
+            class="badge"
+            [class.badge-success]="session.status === 'ACCEPTED' || session.status === 'COMPLETED'"
+            [class.badge-warning]="session.status === 'REQUESTED'"
+            [class.badge-danger]="session.status === 'REJECTED' || session.status === 'CANCELLED'">
+            {{ session.status | titlecase }}
+          </span>
+          <div class="mini-actions">
+            <button mat-icon-button type="button" aria-label="Accept session" (click)="updateSession(session, 'accept')"><mat-icon>check</mat-icon></button>
+            <button mat-icon-button type="button" aria-label="Reject session" (click)="updateSession(session, 'reject')"><mat-icon>close</mat-icon></button>
+            <button mat-icon-button type="button" aria-label="Complete session" (click)="updateSession(session, 'complete')"><mat-icon>task_alt</mat-icon></button>
+            <button mat-icon-button type="button" aria-label="Send reminder" (click)="updateSession(session, 'remind')"><mat-icon>notifications</mat-icon></button>
+            <button mat-icon-button type="button" aria-label="Cancel session" (click)="updateSession(session, 'cancel')"><mat-icon>event_busy</mat-icon></button>
+          </div>
+        </article>
+        <p *ngIf="!allSessions().length" class="empty-copy">No sessions found from the users in the platform.</p>
+      </div>
+    </mat-card>
+
+    <mat-card class="card panel">
+      <div class="panel-heading">
+        <h2>Learning Groups</h2>
+      </div>
+
+      <form [formGroup]="groupForm" class="compact-form">
+        <mat-form-field appearance="outline"><mat-label>Group name</mat-label><input matInput formControlName="name"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Description</mat-label><input matInput formControlName="description"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Created by user ID</mat-label><input matInput type="number" formControlName="createdBy"></mat-form-field>
+        <button mat-flat-button class="btn-primary-pill" type="button" (click)="createGroup()" [disabled]="groupForm.invalid">
+          <mat-icon>group_add</mat-icon>
+          Create group
+        </button>
+      </form>
+
+      <div class="group-layout">
+        <div class="list-stack">
+          <button class="entity-button" type="button" *ngFor="let group of groups()" (click)="selectGroup(group)">
+            <span class="entity-text">
+              <strong>{{ group.name }}</strong>
+              <span class="muted">{{ membersFor(group.id).length }} members · {{ messagesFor(group.id).length }} messages</span>
+            </span>
+          </button>
+        </div>
+
+        <div class="group-detail" *ngIf="selectedGroup() as group">
+          <h3>{{ group.name }}</h3>
+          <p class="muted">{{ group.description }}</p>
+          <div class="meta-line">
+            <span>Created by {{ group.createdBy }}</span>
+            <span>{{ group.createdAt | date: 'medium' }}</span>
+          </div>
+          <form [formGroup]="messageForm" class="compact-form">
+            <mat-form-field appearance="outline"><mat-label>User ID</mat-label><input matInput type="number" formControlName="userId"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Moderation message</mat-label><input matInput formControlName="content"></mat-form-field>
+            <button mat-stroked-button type="button" (click)="postGroupMessage()" [disabled]="messageForm.invalid">Post</button>
+          </form>
+          <article *ngFor="let message of messagesFor(group.id).slice(0, 4)" class="message-row">
+            <strong>User {{ message.userId }}</strong>
+            <span class="muted">{{ message.content }}</span>
+          </article>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="card panel">
+      <div class="panel-heading">
+        <h2>Reviews</h2>
+      </div>
+
+      <div class="review-grid">
+        <article *ngFor="let mentor of mentors()" class="review-card">
+          <strong>{{ mentor.name }}</strong>
+          <span class="star-rating"><mat-icon>star</mat-icon>{{ (averageByMentor()[mentor.id] || mentor.rating || 0) | number: '1.1-1' }}/5</span>
+          <small class="muted">{{ reviewsFor(mentor.id).length }} reviews · {{ mentor.status }}</small>
+        </article>
+      </div>
+    </mat-card>
+  </div>
+
+  <ng-template #noPending>
+    <p class="empty-copy">No mentor applications are pending review.</p>
+  </ng-template>
+</section>

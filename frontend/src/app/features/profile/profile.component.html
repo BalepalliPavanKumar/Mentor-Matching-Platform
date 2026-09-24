@@ -1,0 +1,41 @@
+<section class="profile-page">
+  <div class="page-header">
+    <h2>My Profile</h2>
+    <p>Keep your learner profile in sync</p>
+  </div>
+
+  <div class="profile-grid">
+    <mat-card class="card profile-panel">
+      <div class="panel-heading">
+        <h3>Personal details</h3>
+      </div>
+
+      <form [formGroup]="profileForm" class="profile-form">
+        <mat-form-field appearance="outline"><mat-label>Name</mat-label><input matInput formControlName="name"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Email</mat-label><input matInput formControlName="email"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Phone</mat-label><input matInput formControlName="phone"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Skills</mat-label><input matInput formControlName="skills"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Profile image URL</mat-label><input matInput formControlName="profileImageUrl"></mat-form-field>
+        <button mat-flat-button class="btn-primary-pill" type="button" (click)="saveProfile()" [disabled]="profileForm.invalid">Save profile</button>
+      </form>
+    </mat-card>
+
+    <mat-card class="card mentor-panel" *ngIf="canApplyAsMentor()">
+      <div class="panel-heading">
+        <h3>{{ mentorRecord() ? 'Manage approved mentor presence' : 'Apply to become a mentor' }}</h3>
+        <span class="muted" *ngIf="!mentorRecord()">The current backend does not expose pending mentor applications in a list endpoint.</span>
+      </div>
+
+      <form [formGroup]="mentorForm" class="profile-form">
+        <mat-form-field appearance="outline"><mat-label>Bio</mat-label><textarea matInput rows="3" formControlName="bio"></textarea></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Skills</mat-label><input matInput formControlName="skills"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Experience</mat-label><input matInput formControlName="experience"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Hourly rate</mat-label><input matInput type="number" formControlName="hourlyRate"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Availability</mat-label><input matInput formControlName="availability"></mat-form-field>
+        <button mat-flat-button class="btn-primary-pill" type="button" (click)="saveMentorStatus()" [disabled]="mentorForm.invalid">
+          {{ mentorRecord() ? 'Update availability' : 'Submit application' }}
+        </button>
+      </form>
+    </mat-card>
+  </div>
+</section>

@@ -78,6 +78,10 @@ public class MentorService {
                 .orElseThrow(() -> new ResourceNotFoundException("Mentor not found with id: " + id));
     }
 
+    public List<Mentor> getMentorsByStatus(String status) {
+        return mentorRepository.findByStatus(status);
+    }
+
     public List<Mentor> searchMentors(String skill, Double minRating, String experience, Double maxPrice, String availability) {
         List<Mentor> mentors = mentorRepository.findByStatus("APPROVED");
 

@@ -14,30 +14,50 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/users/**
+          filters:
+            - Authentication
         - id: mentor-service
           uri: lb://MENTOR-SERVICE
           predicates:
             - Path=/mentors/**
+          filters:
+            - Authentication
         - id: skill-service
           uri: lb://SKILL-SERVICE
           predicates:
             - Path=/skills/**
+          filters:
+            - Authentication
         - id: session-service
           uri: lb://SESSION-SERVICE
           predicates:
             - Path=/sessions/**
+          filters:
+            - Authentication
         - id: group-service
           uri: lb://GROUP-SERVICE
           predicates:
             - Path=/groups/**
+          filters:
+            - Authentication
         - id: review-service
           uri: lb://REVIEW-SERVICE
           predicates:
             - Path=/reviews/**
+          filters:
+            - Authentication
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notifications/**
+          filters:
+            - Authentication
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: "*"
+            allowedOrigins:
+              - "http://localhost:4200"
+              - "http://localhost:4300"
             allowedMethods:
               - GET
               - POST
@@ -45,6 +65,10 @@ spring:
               - DELETE
               - OPTIONS
             allowedHeaders: "*"
+            allowCredentials: true
+
+jwt:
+  secret: ${JWT_SECRET:mysecretkeymysecretkeymysecretkey12} # Defaults for local, override in Docker
 
 server:
   port: 8080

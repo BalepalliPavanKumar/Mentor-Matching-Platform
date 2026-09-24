@@ -1,0 +1,73 @@
+.register-screen {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--canvas);
+}
+
+.register-card {
+  width: min(100%, 500px);
+  padding: 28px;
+  border-radius: 16px !important;
+}
+
+.register-copy {
+  margin-bottom: 18px;
+
+  h1,
+  span,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    margin-top: 14px;
+    font-size: 1.6rem;
+  }
+
+  span {
+    display: block;
+    margin-top: 10px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-size: 0.9rem;
+  }
+}
+
+.hero-brand {
+  font-size: 1.5rem;
+  font-weight: 800;
+
+  .brand-skill {
+    color: var(--ink);
+  }
+
+  .brand-sync {
+    color: var(--accent-orange);
+  }
+}
+
+.register-form {
+  display: grid;
+  gap: 12px;
+}
+
+.submit-button {
+  height: 48px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.switch-copy {
+  margin: 20px 2px 4px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+
+  a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+  }
+}

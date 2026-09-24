@@ -82,10 +82,13 @@ public class AuthenticationGatewayFilterFactory extends AbstractGatewayFilterFac
             return !role.equals("ROLE_ADMIN");
         }
         if ("POST".equals(method) && "/mentors/apply".equals(path)) {
-            return !role.equals("ROLE_LEARNER");
+            return !role.equals("ROLE_LEARNER") && !role.equals("ROLE_MENTOR");
         }
         if ("POST".equals(method) && "/mentors".equals(path)) {
             return !role.equals("ROLE_MENTOR");
+        }
+        if ("GET".equals(method) && "/mentors/pending".equals(path)) {
+            return !role.equals("ROLE_ADMIN");
         }
         if ("PUT".equals(method) && path.startsWith("/mentors/") && path.endsWith("/availability")) {
             return !role.equals("ROLE_MENTOR");

@@ -7,11 +7,36 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
+    volumes:
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
+  db-init:
+    image: postgres:15-alpine
+    container_name: skillsync-db-init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: root
+    command:
+      - sh
+      - -c
+      - |
+        until pg_isready -h postgres -U postgres >/dev/null 2>&1; do
+          echo "waiting for postgres to accept connections..."
+          sleep 2
+        done
+        for db in skillsync_auth skillsync_user skillsync_mentor skillsync_skill skillsync_session skillsync_notification skillsync_group skillsync_review_db; do
+          psql -h postgres -U postgres -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '$$db'" | grep -q 1 || psql -h postgres -U postgres -d postgres -c "CREATE DATABASE $$db"
+        done
+    restart: "no"
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -20,10 +45,12 @@ services:
       - "5672:5672"
       - "15672:15672"
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 5
+      start_period: 240s
+    restart: unless-stopped
 
   service-registry:
     build: ./service-registry
@@ -36,6 +63,7 @@ services:
       timeout: 10s
       retries: 10
       start_period: 40s
+    restart: unless-stopped
 
   config-server:
     build: ./config-server
@@ -45,7 +73,6 @@ services:
     volumes:
       - ./config-server/config-repo:/app/config-repo
     environment:
-      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: file:///app/config-repo
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
       ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
@@ -57,6 +84,7 @@ services:
       timeout: 10s
       retries: 10
       start_period: 50s
+    restart: unless-stopped
 
   api-gateway:
     build: ./api-gateway
@@ -71,7 +99,7 @@ services:
     depends_on:
       config-server:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
 
   auth-service:
     build: ./auth-service
@@ -80,16 +108,21 @@ services:
       - "8081:8081"
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SERVER_PORT: 8081
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/skillsync_auth
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       JWT_SECRET: ${JWT_SECRET:-mysecretkeymysecretkeymysecretkey12}
       ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
       config-server:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
 
   user-service:
     build: ./user-service
@@ -98,15 +131,20 @@ services:
       - "8084:8084"
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SERVER_PORT: 8084
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/skillsync_user
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
       config-server:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
 
   mentor-service:
     build: ./mentor-service
@@ -115,15 +153,23 @@ services:
       - "8082:8082"
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SERVER_PORT: 8082
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/skillsync_mentor
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_RABBITMQ_HOST: rabbitmq
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
-      postgres:
+      db-init:
+        condition: service_completed_successfully
+      rabbitmq:
         condition: service_healthy
       config-server:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
 
   skill-service:
     build: ./skill-service
@@ -132,15 +178,20 @@ services:
       - "8085:8085"
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SERVER_PORT: 8085
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/skillsync_skill
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
       config-server:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
 
   session-service:
     build: ./session-service
@@ -149,18 +200,23 @@ services:
       - "8086:8086"
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SERVER_PORT: 8086
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/skillsync_session
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_RABBITMQ_HOST: rabbitmq
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
       config-server:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
 
   notification-service:
     build: ./notification-service
@@ -169,16 +225,23 @@ services:
       - "8089:8089"
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SERVER_PORT: 8089
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/skillsync_notification
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_RABBITMQ_HOST: rabbitmq
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
+      db-init:
+        condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
       config-server:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
 
   group-service:
     build: ./group-service
@@ -187,15 +250,20 @@ services:
       - "8087:8087"
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SERVER_PORT: 8087
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/skillsync_group
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
       config-server:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
 
   review-service:
     build: ./review-service
@@ -204,22 +272,41 @@ services:
       - "8088:8088"
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SERVER_PORT: 8088
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/skillsync_review_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
       config-server:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
 
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
       - "9411:9411"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: skillsync-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      api-gateway:
+        condition: service_started
+    restart: unless-stopped
 
 networks:
   default:
     name: skillsync-network
+
+volumes:
+  postgres-data:

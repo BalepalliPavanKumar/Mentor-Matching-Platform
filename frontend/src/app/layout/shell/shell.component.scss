@@ -1,126 +1,157 @@
 .shell-container {
-    height: 100vh;
-    width: 100vw;
+  min-height: 100vh;
+  background: var(--canvas);
 }
 
-.side-nav {
-    width: 260px;
-    background: #0b1120;
-    color: white;
-    border-right: none;
-    display: flex;
-    flex-direction: column;
+.sidebar {
+  width: 260px;
+  padding: 22px 14px;
+  border-right: none;
+  background: var(--ink-sidebar);
+  color: #e2e8f0;
 }
 
-.brand {
-    padding: 30px 20px;
-    text-align: center;
-    
-    .logo {
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin: 0;
-        letter-spacing: -1px;
-        color: white;
-        
-        span {
-            color: #e71e30;
-        }
-    }
+.brand-block {
+  padding: 10px 14px 26px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+  }
+
+  .brand-skill {
+    color: #fff;
+  }
+
+  .brand-sync {
+    color: var(--accent-orange);
+  }
 }
 
-.nav-list {
-    flex: 1;
-    padding-top: 20px;
+::ng-deep .sidebar .mat-mdc-list-item {
+  color: #c3cde3;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  height: 46px;
 
-    a {
-        margin: 4px 12px;
-        border-radius: 8px;
-        color: rgba(255, 255, 255, 0.7);
-        transition: all 0.2s ease;
+  .mdc-list-item__primary-text {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #c3cde3;
+  }
 
-        mat-icon {
-            color: inherit;
-        }
+  mat-icon {
+    color: #c3cde3;
+  }
 
-        &:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-        }
+  &:hover {
+    background: var(--ink-sidebar-hover);
+    color: #ffffff;
 
-        &.active-link {
-            background: rgba(231, 30, 48, 0.1);
-            color: #e71e30;
-            font-weight: 600;
-
-            mat-icon {
-                color: #e71e30;
-            }
-        }
-    }
-}
-
-.user-info {
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-
-    .avatar {
-        width: 40px;
-        height: 40px;
-        background: #e71e30;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        color: white;
+    .mdc-list-item__primary-text {
+      color: #ffffff;
     }
 
-    .details {
-        flex: 1;
-        overflow: hidden;
-
-        p {
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .name {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .role {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5);
-        }
+    mat-icon {
+      color: #ffffff;
     }
-
-    button {
-        color: rgba(255, 255, 255, 0.5);
-        &:hover { color: white; }
-    }
+  }
 }
 
-.header {
-    background: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    height: 64px;
+::ng-deep .sidebar .active-link {
+  background: rgba(220, 38, 38, 0.16) !important;
+  border-left: 3px solid var(--primary);
+  color: #fff !important;
+
+  .mdc-list-item__primary-text {
+    color: #fff !important;
+  }
+
+  mat-icon {
+    color: var(--primary) !important;
+  }
 }
 
-.main-content {
-    padding: 24px;
-    background: #f8fafc;
-    min-height: calc(100vh - 64px);
-    overflow-y: auto;
+.content-area {
+  background: transparent;
+}
+
+.top-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  gap: 14px;
+  height: auto;
+  min-height: 76px;
+  padding: 18px 28px;
+  background: var(--canvas);
 }
 
 .spacer {
-    flex: 1 1 auto;
+  flex: 1;
+}
+
+.admin-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #fff;
+  }
+}
+
+.bell-button {
+  color: var(--muted);
+}
+
+.user-menu-trigger {
+  min-width: 0;
+  padding: 0;
+  border-radius: 999px;
+}
+
+.user-menu-trigger .avatar-circle {
+  width: 42px;
+  height: 42px;
+  font-size: 0.9rem;
+}
+
+.menu-user-info {
+  padding: 10px 16px 6px;
+
+  strong,
+  span {
+    display: block;
+  }
+
+  span {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+}
+
+.page-content {
+  padding: 0 28px 28px;
+}
+
+@media (max-width: 960px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .page-content {
+    padding: 0 16px 16px;
+  }
 }

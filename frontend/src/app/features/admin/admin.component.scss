@@ -1,0 +1,401 @@
+.admin-page {
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stats-grid,
+.console-grid,
+.operations-grid,
+.split-panel,
+.group-layout,
+.review-grid,
+.approval-list,
+.activity-list,
+.metric-bars,
+.list-stack,
+.session-list,
+.compact-form,
+.editor-form,
+.chip-cloud {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-header,
+.panel-heading,
+.approval-row,
+.session-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-header {
+  h1,
+  span {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+  }
+
+  span {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+  }
+}
+
+.stats-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stat-card {
+  .tone-red {
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+
+  .tone-blue {
+    background: #eff6ff;
+    color: #2563eb;
+  }
+
+  .tone-green {
+    background: #f0fdf4;
+    color: var(--success);
+  }
+
+  .tone-gold {
+    background: #fffbeb;
+    color: var(--gold);
+  }
+}
+
+.console-grid {
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+}
+
+.operations-grid,
+.split-panel,
+.group-layout {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panel {
+  padding: 20px;
+}
+
+.panel-heading {
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+}
+
+.view-all {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.approval-row,
+.session-row,
+.activity-item,
+.message-row,
+.review-card,
+.group-detail {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.approval-row {
+  align-items: center;
+
+  .avatar-circle {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+  }
+}
+
+.approval-info {
+  flex: 1;
+  min-width: 0;
+
+  strong {
+    display: block;
+  }
+
+  .muted {
+    display: block;
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin: 3px 0 8px;
+  }
+}
+
+.exp-col {
+  color: var(--muted);
+  font-size: 0.86rem;
+  flex-shrink: 0;
+}
+
+.skills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.session-row {
+  align-items: flex-start;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.meta-line,
+.row-actions,
+.mini-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meta-line {
+  color: var(--muted);
+  font-size: 0.82rem;
+
+  span {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--canvas);
+  }
+}
+
+.row-actions,
+.mini-actions {
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.approve-button {
+  background: var(--success-soft) !important;
+  color: var(--success) !important;
+  --mdc-filled-button-container-color: var(--success-soft);
+  --mdc-filled-button-label-text-color: var(--success);
+}
+
+.reject-button {
+  background: var(--danger-soft) !important;
+  color: var(--danger) !important;
+  --mdc-filled-button-container-color: var(--danger-soft);
+  --mdc-filled-button-label-text-color: var(--danger);
+  min-width: 40px !important;
+  padding: 0 12px !important;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  strong {
+    display: block;
+  }
+
+  .muted {
+    display: block;
+    margin-top: 3px;
+    font-size: 0.84rem;
+  }
+}
+
+.activity-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.activity-good {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.activity-warn {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.activity-info {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.activity-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.metric-bars label {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+
+  mat-progress-bar {
+    grid-column: 1 / -1;
+    border-radius: 999px;
+    height: 8px;
+  }
+}
+
+.compact-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: start;
+}
+
+.editor-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  button {
+    justify-self: start;
+  }
+}
+
+.entity-button {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--canvas);
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .avatar-circle {
+    width: 34px;
+    height: 34px;
+    font-size: 0.78rem;
+  }
+
+  .entity-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .muted {
+    margin-top: 2px;
+    font-size: 0.8rem;
+  }
+}
+
+.chip-cloud {
+  grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
+  margin-top: 16px;
+}
+
+.session-row strong,
+.session-row span,
+.session-row small,
+.review-card strong,
+.review-card span,
+.review-card small {
+  display: block;
+}
+
+.session-row .muted,
+.review-card small,
+.message-row span,
+.group-detail p {
+  margin-top: 4px;
+  font-size: 0.84rem;
+}
+
+.group-detail h3 {
+  margin-bottom: 6px;
+}
+
+.group-detail .compact-form {
+  margin-top: 14px;
+}
+
+.message-row {
+  margin-top: 10px;
+}
+
+.review-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.review-card .star-rating {
+  margin-top: 6px;
+}
+
+pre {
+  max-height: 260px;
+  overflow: auto;
+  margin: 12px 0 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--ink-sidebar);
+  color: #f8fafc;
+  white-space: pre-wrap;
+}
+
+.empty-copy {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 1180px) {
+  .stats-grid,
+  .console-grid,
+  .operations-grid,
+  .split-panel,
+  .group-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-header,
+  .panel-heading,
+  .approval-row,
+  .session-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .compact-form,
+  .editor-form {
+    grid-template-columns: 1fr;
+  }
+
+  .row-actions,
+  .mini-actions {
+    justify-content: flex-start;
+  }
+}

@@ -1,0 +1,7 @@
+target/
+.git/
+.classpath
+.project
+.settings/
+*.log
+config-repo/

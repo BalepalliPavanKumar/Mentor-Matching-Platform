@@ -12,7 +12,7 @@ spring:
         git:
           enabled: false # FORCE DISABLE GIT
         native:
-          search-locations: file:///c:/Users/pavan_gdy3dem/OneDrive/Desktop/SkillSync-Platform/config-server/config-repo/
+          search-locations: ${CONFIG_REPO_LOCATION:file:///app/config-repo/}
 
 eureka:
   client:

@@ -1,41 +1,58 @@
 <mat-sidenav-container class="shell-container">
-  <!-- Sidebar -->
-  <mat-sidenav mode="side" opened class="side-nav">
-    <div class="brand">
-      <h2 class="logo">Skill<span>Sync</span></h2>
+  <mat-sidenav mode="side" opened class="sidebar">
+    <div class="brand-block">
+      <h1><span class="brand-skill">Skill</span><span class="brand-sync">Sync</span></h1>
     </div>
 
-    <mat-nav-list class="nav-list">
-      <a mat-list-item *ngFor="let item of menuItems" 
-         [routerLink]="item.route" 
-         routerLinkActive="active-link">
+    <mat-nav-list>
+      <a
+        mat-list-item
+        *ngFor="let item of menuItems()"
+        [routerLink]="item.route"
+        routerLinkActive="active-link">
         <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
         <span matListItemTitle>{{ item.label }}</span>
       </a>
     </mat-nav-list>
-
-    <div class="user-info">
-        <div class="avatar">{{ authStore.user()?.username?.[0]?.toUpperCase() || 'U' }}</div>
-        <div class="details">
-            <p class="name">{{ authStore.user()?.username }}</p>
-            <p class="role">{{ authStore.isAdmin() ? 'Administrator' : 'Learner' }}</p>
-        </div>
-        <button mat-icon-button (click)="logout()">
-            <mat-icon>logout</mat-icon>
-        </button>
-    </div>
   </mat-sidenav>
 
-  <!-- Main Content Area -->
-  <mat-sidenav-content>
-    <mat-toolbar class="header">
+  <mat-sidenav-content class="content-area">
+    <mat-toolbar class="top-toolbar">
       <span class="spacer"></span>
-      <button mat-icon-button class="notification-btn">
-        <mat-icon matBadge="3" matBadgeColor="warn">notifications</mat-icon>
+
+      <span class="admin-pill" *ngIf="authStore.isAdmin()">
+        <span class="dot"></span>ADMIN
+      </span>
+
+      <button mat-icon-button class="bell-button" type="button">
+        <mat-icon>notifications</mat-icon>
       </button>
+
+      <button
+        mat-button
+        class="user-menu-trigger"
+        [matMenuTriggerFor]="userMenu"
+        type="button">
+        <span class="avatar-circle" [style.background]="avatarBg()">{{ initials() }}</span>
+      </button>
+
+      <mat-menu #userMenu="matMenu">
+        <div class="menu-user-info">
+          <strong>{{ authStore.user()?.name }}</strong>
+          <span>{{ authStore.displayRole() }}</span>
+        </div>
+        <a mat-menu-item routerLink="/profile">
+          <mat-icon>badge</mat-icon>
+          <span>My Profile</span>
+        </a>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Sign out</span>
+        </button>
+      </mat-menu>
     </mat-toolbar>
 
-    <main class="main-content">
+    <main class="page-content">
       <router-outlet></router-outlet>
     </main>
   </mat-sidenav-content>

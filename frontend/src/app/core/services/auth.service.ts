@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import { AuthResponse, LoginRequest } from '../models/auth.model';
+import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,10 +12,10 @@ export class AuthService {
   private api = inject(ApiService);
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.api.baseUrl}/auth/login`, credentials);
+    return this.http.post<AuthResponse>(this.api.endpoint('/auth/login'), credentials);
   }
 
-  register(userData: any): Observable<any> {
-    return this.http.post(`${this.api.baseUrl}/auth/register`, userData);
+  register(userData: RegisterRequest): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(this.api.endpoint('/auth/register'), userData);
   }
 }

@@ -1,74 +1,87 @@
-<div class="login-container">
-  <div class="split-panel">
-    <!-- Left Panel: Branding & Value Prop -->
-    <div class="brand-panel">
-      <div class="brand-content">
-        <h1 class="logo">Skill<span>Sync</span></h1>
-        <p class="tagline">Peer Learning & Mentor Matching Platform</p>
-        
-        <ul class="features-list">
-          <li><mat-icon>explore</mat-icon> Find expert mentors matched to your goals</li>
-          <li><mat-icon>event_available</mat-icon> Book 1-on-1 sessions at your convenience</li>
-          <li><mat-icon>groups</mat-icon> Join peer learning groups & communities</li>
-          <li><mat-icon>stars</mat-icon> Track your growth with ratings & reviews</li>
-        </ul>
-      </div>
+<section class="auth-screen">
+  <div class="auth-hero">
+    <div class="hero-brand">
+      <span class="brand-skill">Skill</span><span class="brand-sync">Sync</span>
     </div>
+    <p class="hero-tagline">Peer Learning &amp; Mentor Matching Platform</p>
 
-    <!-- Right Panel: Login Form -->
-    <div class="form-panel">
-      <div class="login-box">
-        <h2>Welcome back 👋</h2>
-        <p class="subtitle">Sign in to your SkillSync account</p>
+    <ul class="feature-list">
+      <li>
+        <span class="feature-icon"><mat-icon>track_changes</mat-icon></span>
+        Find expert mentors matched to your goals
+      </li>
+      <li>
+        <span class="feature-icon"><mat-icon>calendar_month</mat-icon></span>
+        Book 1-on-1 sessions at your convenience
+      </li>
+      <li>
+        <span class="feature-icon"><mat-icon>groups</mat-icon></span>
+        Join peer learning groups &amp; communities
+      </li>
+      <li>
+        <span class="feature-icon"><mat-icon>star</mat-icon></span>
+        Track your growth with ratings &amp; reviews
+      </li>
+    </ul>
+  </div>
 
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email Address</mat-label>
-            <input matInput formControlName="email" type="email" placeholder="rahul.sharma@example.com">
-            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>
-            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Invalid email format</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" placeholder="••••••••••••">
-            <mat-icon matSuffix>visibility_off</mat-icon>
-            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
-            <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">Minimum 6 characters</mat-error>
-          </mat-form-field>
-
-          <div class="form-options">
-            <mat-checkbox formControlName="rememberMe" color="primary">Remember me</mat-checkbox>
-            <a routerLink="/auth/forgot-password" class="forgot-link">Forgot Password?</a>
-          </div>
-
-          <div *ngIf="authStore.error()" class="login-error">
-            {{ authStore.error() }}
-          </div>
-
-          <button mat-flat-button color="primary" class="login-btn" type="submit" [disabled]="loginForm.invalid || authStore.isLoading()">
-            <span *ngIf="!authStore.isLoading()">SIGN IN →</span>
-            <span *ngIf="authStore.isLoading()">SIGNING IN...</span>
-          </button>
-
-          <div class="divider">
-            <span>or continue with</span>
-          </div>
-
-          <div class="social-login">
-            <button mat-stroked-button type="button" class="social-btn">
-              <span class="dot google"></span> Google
-            </button>
-            <button mat-stroked-button type="button" class="social-btn">
-              <span class="dot linkedin"></span> LinkedIn
-            </button>
-          </div>
-
-          <p class="register-prompt">
-            Don't have an account? <a routerLink="/auth/register">Create one free</a>
-          </p>
-        </form>
+  <div class="auth-panel">
+    <div class="auth-form-wrap">
+      <div class="card-header">
+        <h2>Welcome back <span class="wave">👋</span></h2>
+        <span>Sign in to your SkillSync account</span>
       </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Email Address</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="you@example.com">
+          <mat-error *ngIf="loginForm.controls.email.hasError('required')">Email is required.</mat-error>
+          <mat-error *ngIf="loginForm.controls.email.hasError('email')">Enter a valid email.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'">
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword.set(!hidePassword())">
+            <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.controls.password.hasError('required')">Password is required.</mat-error>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-checkbox color="primary" [checked]="rememberMe()" (change)="rememberMe.set($event.checked)">
+            Remember me
+          </mat-checkbox>
+          <a class="forgot-link">Forgot Password?</a>
+        </div>
+
+        <div class="status-strip" *ngIf="authStore.error()">{{ authStore.error() }}</div>
+
+        <button
+          mat-flat-button
+          class="btn-primary-pill sign-in-button"
+          type="submit"
+          [disabled]="loginForm.invalid || authStore.isLoading()">
+          {{ authStore.isLoading() ? 'Signing in…' : 'SIGN IN →' }}
+        </button>
+      </form>
+
+      <div class="divider"><span>or continue with</span></div>
+
+      <div class="social-row">
+        <button mat-stroked-button type="button" disabled>
+          <mat-icon>mail</mat-icon> Google
+        </button>
+        <button mat-stroked-button type="button" disabled>
+          <mat-icon>work</mat-icon> LinkedIn
+        </button>
+      </div>
+
+      <p class="switch-copy">
+        Don't have an account?
+        <a routerLink="/auth/register">Create one free</a>
+      </p>
     </div>
   </div>
-</div>
+</section>

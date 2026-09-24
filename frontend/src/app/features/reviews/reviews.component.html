@@ -1,0 +1,58 @@
+<section class="reviews-page">
+  <div class="page-header">
+    <h2>Reviews</h2>
+    <p>Share feedback after a completed session</p>
+  </div>
+
+  <div class="reviews-grid">
+    <mat-card class="card submit-panel">
+      <div class="panel-heading">
+        <h3>Submit a review</h3>
+      </div>
+
+      <form [formGroup]="reviewForm" class="review-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Mentor</mat-label>
+          <mat-select formControlName="mentorId" (selectionChange)="loadMentorReviews($event.value)">
+            <mat-option *ngFor="let mentor of mentors()" [value]="mentor.id">{{ mentor.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Rating</mat-label>
+          <mat-select formControlName="rating">
+            <mat-option [value]="5">5</mat-option>
+            <mat-option [value]="4">4</mat-option>
+            <mat-option [value]="3">3</mat-option>
+            <mat-option [value]="2">2</mat-option>
+            <mat-option [value]="1">1</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Comment</mat-label>
+          <textarea matInput rows="4" formControlName="comment"></textarea>
+        </mat-form-field>
+
+        <button mat-flat-button class="btn-primary-pill" type="button" (click)="submitReview()" [disabled]="reviewForm.invalid">Submit review</button>
+      </form>
+    </mat-card>
+
+    <mat-card class="card history-panel">
+      <div class="panel-heading">
+        <h3>Mentor feedback</h3>
+        <span class="star-rating"><mat-icon>star</mat-icon>{{ average() | number:'1.1-1' }} average</span>
+      </div>
+
+      <article class="review-item" *ngFor="let review of reviews()">
+        <div class="review-top">
+          <strong>Learner #{{ review.userId }}</strong>
+          <span class="star-rating"><mat-icon>star</mat-icon>{{ review.rating }}/5</span>
+        </div>
+        <p>{{ review.comment }}</p>
+      </article>
+
+      <p class="empty-state" *ngIf="!reviews().length">No reviews yet for this mentor.</p>
+    </mat-card>
+  </div>
+</section>

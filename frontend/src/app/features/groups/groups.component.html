@@ -1,40 +1,98 @@
-<div class="groups-container">
-  <header class="page-header">
-    <div class="header-main">
-        <h1>Peer Learning Groups</h1>
-        <p class="subtitle">Connect with peers, share knowledge, and learn together in communities</p>
+<section class="groups-page">
+  <div class="page-header">
+    <div>
+      <h2>Learning Groups</h2>
+      <p>Join peer communities and learn together</p>
     </div>
-    <button mat-flat-button color="primary">Create New Group</button>
-  </header>
+    <a mat-flat-button class="btn-primary-pill" href="#create-group">
+      <mat-icon>add</mat-icon>
+      Create New Group
+    </a>
+  </div>
+
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Search groups by topic, skill…">
+  </mat-form-field>
+
+  <div class="tab-row">
+    <button type="button" [class.active]="activeTab() === 'all'" (click)="activeTab.set('all')">All Groups</button>
+    <button type="button" [class.active]="activeTab() === 'mine'" (click)="activeTab.set('mine')">My Groups</button>
+    <button type="button" [class.active]="activeTab() === 'trending'" (click)="activeTab.set('trending')">Trending</button>
+    <button type="button" [class.active]="activeTab() === 'recommended'" (click)="activeTab.set('recommended')">Recommended</button>
+  </div>
 
   <div class="groups-grid">
-    <mat-card *ngFor="let group of groups()" class="group-card">
-      <div class="group-header">
-        <div class="group-avatar">{{ group.image }}</div>
-        <div class="group-meta">
-          <h3>{{ group.name }}</h3>
-          <div class="stats">
-            <span><mat-icon>people</mat-icon> {{ group.members }} members</span>
-            <span *ngIf="group.activeSessions > 0" class="active">
-                <mat-icon>live_tv</mat-icon> {{ group.activeSessions }} live
-            </span>
+    <div class="group-list">
+      <mat-card class="card group-card" *ngFor="let group of filteredGroups()" (click)="selectGroup(group)" [class.selected]="selectedGroup()?.id === group.id">
+        <div class="group-icon" [style.background]="groupColor(group.name)">
+          <mat-icon>groups</mat-icon>
+        </div>
+
+        <div class="group-body">
+          <div class="group-top">
+            <strong>{{ group.name }}</strong>
+            <span class="member-count">{{ membersFor(group.id).length }}<small>Members</small></span>
+          </div>
+          <span class="muted">{{ membersFor(group.id).length }} members · Created by user #{{ group.createdBy }}</span>
+          <p>{{ group.description }}</p>
+
+          <div class="group-footer">
+            <span class="badge badge-success">● Public Group</span>
+            <button
+              mat-flat-button
+              type="button"
+              class="btn-primary-pill"
+              [class.joined]="isMember(group.id || 0)"
+              (click)="$event.stopPropagation(); toggleMembership(group)">
+              {{ isMember(group.id || 0) ? '✓ Joined' : '+ Join Group' }}
+            </button>
           </div>
         </div>
+      </mat-card>
+
+      <p class="empty-state" *ngIf="!filteredGroups().length">No groups match this view yet.</p>
+    </div>
+
+    <mat-card class="card discussion-panel" *ngIf="selectedGroup() as group">
+      <div class="discussion-head">
+        <h3>{{ group.name }}</h3>
+        <span class="muted">{{ memberCount() }} active members</span>
       </div>
 
-      <p class="description">{{ group.description }}</p>
-
-      <mat-chip-set class="tags">
-        <mat-chip *ngFor="let tag of group.tags">{{ tag }}</mat-chip>
-      </mat-chip-set>
-
-      <div class="group-footer">
-        <button mat-button color="primary" *ngIf="group.joined">View Discussions</button>
-        <button mat-flat-button [color]="group.joined ? 'warn' : 'primary'" 
-                (click)="toggleJoin(group)" class="join-btn">
-          {{ group.joined ? 'Leave Group' : 'Join Community' }}
-        </button>
+      <div class="messages">
+        <article class="message" *ngFor="let message of messages()">
+          <strong>User #{{ message.userId }}</strong>
+          <p>{{ message.content }}</p>
+        </article>
+        <p class="empty-state" *ngIf="!messages().length">No messages yet — start the discussion.</p>
       </div>
+
+      <form [formGroup]="messageForm" class="message-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Post to discussion</mat-label>
+          <textarea matInput rows="3" formControlName="content"></textarea>
+        </mat-form-field>
+        <button mat-flat-button class="btn-primary-pill" type="button" (click)="sendMessage()" [disabled]="messageForm.invalid">Send message</button>
+      </form>
     </mat-card>
   </div>
-</div>
+
+  <mat-card class="card create-panel" id="create-group">
+    <div class="section-title">
+      <h3>Launch a new study circle</h3>
+    </div>
+
+    <form [formGroup]="createGroupForm" class="create-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Group name</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="3" formControlName="description"></textarea>
+      </mat-form-field>
+      <button mat-flat-button class="btn-primary-pill" type="button" (click)="createGroup()" [disabled]="createGroupForm.invalid">Create group</button>
+    </form>
+  </mat-card>
+</section>

@@ -1,93 +1,160 @@
-<div class="booking-container">
-  <header class="page-header">
-    <h1>Book a Session</h1>
-    <p class="subtitle">Select a mentor and schedule your next learning session</p>
-  </header>
+<section class="sessions-page">
+  <div class="page-header">
+    <h2>Book a Session</h2>
+    <p>Schedule a 1-on-1 session with your chosen mentor</p>
+  </div>
 
-  <mat-card class="stepper-card">
-    <mat-stepper [linear]="isLinear" #stepper>
-      
-      <!-- Step 1: Select Mentor -->
-      <mat-step [stepControl]="firstFormGroup">
-        <form [formGroup]="firstFormGroup">
-          <ng-template matStepLabel>Select Mentor</ng-template>
-          <div class="step-content">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Choose your mentor</mat-label>
-              <mat-select formControlName="mentor">
-                <mat-option *ngFor="let m of mentors" [value]="m.id">
-                  {{ m.name }} — {{ m.role }}
-                </mat-option>
+  <div class="booking-grid">
+    <mat-card class="card booking-panel">
+      <mat-stepper [linear]="true" #stepper>
+        <mat-step [stepControl]="firstFormGroup">
+          <form [formGroup]="firstFormGroup">
+            <ng-template matStepLabel>Select Date</ng-template>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Mentor</mat-label>
+              <mat-select formControlName="mentorId">
+                <mat-option *ngFor="let mentor of mentors()" [value]="mentor.id">{{ mentor.name }} — ₹{{ mentor.hourlyRate }}/hr</mat-option>
               </mat-select>
             </mat-form-field>
-            <div class="actions">
-              <button mat-flat-button color="primary" matStepperNext>Next</button>
-            </div>
-          </div>
-        </form>
-      </mat-step>
 
-      <!-- Step 2: Date & Time -->
-      <mat-step [stepControl]="secondFormGroup">
-        <form [formGroup]="secondFormGroup">
-          <ng-template matStepLabel>Schedule</ng-template>
-          <div class="step-content">
-            <div class="datetime-picker">
-              <mat-form-field appearance="outline">
-                <mat-label>Choose a date</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="date">
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Available Time Slots</mat-label>
-                <mat-select formControlName="time">
-                  <mat-option *ngFor="let slot of timeSlots" [value]="slot">{{ slot }}</mat-option>
-                </mat-select>
-              </mat-form-field>
+            <div class="calendar-wrap">
+              <mat-calendar
+                [selected]="firstFormGroup.value.date ?? null"
+                (selectedChange)="firstFormGroup.patchValue({ date: $event })"
+                [dateClass]="dateHasSlots">
+              </mat-calendar>
             </div>
-            <div class="actions">
-              <button mat-button matStepperPrevious>Back</button>
-              <button mat-flat-button color="primary" matStepperNext>Next</button>
-            </div>
-          </div>
-        </form>
-      </mat-step>
 
-      <!-- Step 3: Confirmation -->
-      <mat-step [stepControl]="thirdFormGroup">
-        <form [formGroup]="thirdFormGroup">
-          <ng-template matStepLabel>Details</ng-template>
-          <div class="step-content">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>What do you want to learn?</mat-label>
-              <input matInput formControlName="topic" placeholder="e.g., Spring Boot Security">
-            </mat-form-field>
-            
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Additional Notes</mat-label>
-              <textarea matInput formControlName="description" rows="4"></textarea>
+            <div class="step-actions">
+              <button mat-flat-button class="btn-primary-pill" matStepperNext [disabled]="firstFormGroup.invalid">Choose Slot</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step [stepControl]="secondFormGroup">
+          <form [formGroup]="secondFormGroup">
+            <ng-template matStepLabel>Choose Slot</ng-template>
+
+            <p class="field-label">Available slots</p>
+            <div class="pill-row">
+              <button
+                type="button"
+                *ngFor="let slot of timeSlots"
+                class="pill-option"
+                [class.selected]="secondFormGroup.value.time === slot"
+                (click)="secondFormGroup.patchValue({ time: slot })">
+                {{ slot }}
+              </button>
+            </div>
+
+            <p class="field-label">Session duration</p>
+            <div class="pill-row">
+              <button
+                type="button"
+                *ngFor="let duration of durations"
+                class="pill-option"
+                [class.selected]="secondFormGroup.value.duration === duration"
+                (click)="secondFormGroup.patchValue({ duration })">
+                {{ duration }} min
+              </button>
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Session topic</mat-label>
+              <input matInput formControlName="topic" placeholder="e.g. Spring Boot REST APIs & JPA">
             </mat-form-field>
 
-            <div class="actions">
-              <button mat-button matStepperPrevious>Back</button>
-              <button mat-flat-button color="warn" (click)="confirmBooking()">Confirm & Book</button>
+            <div class="step-actions">
+              <button mat-stroked-button matStepperPrevious>Back</button>
+              <button mat-flat-button class="btn-primary-pill" matStepperNext [disabled]="secondFormGroup.invalid">Review request</button>
             </div>
-          </div>
-        </form>
-      </mat-step>
+          </form>
+        </mat-step>
 
-    </mat-stepper>
-  </mat-card>
+        <mat-step [stepControl]="thirdFormGroup">
+          <form [formGroup]="thirdFormGroup">
+            <ng-template matStepLabel>Confirm &amp; Pay</ng-template>
+            <p class="confirm-copy">Review the session summary and confirm your booking.</p>
+            <div class="step-actions">
+              <button mat-stroked-button matStepperPrevious>Back</button>
+              <button mat-flat-button class="btn-primary-pill" type="button" (click)="confirmBooking()">Confirm Booking</button>
+            </div>
+          </form>
+        </mat-step>
+      </mat-stepper>
+    </mat-card>
 
-  <!-- Success Message -->
-  <div *ngIf="bookingConfirmed()" class="success-banner">
-    <mat-icon>check_circle</mat-icon>
-    <div class="text">
-        <h3>Session Booked Successfully!</h3>
-        <p>You'll receive a notification once the mentor accepts your request.</p>
-    </div>
-    <button mat-button color="primary" routerLink="/dashboard">Go to Dashboard</button>
+    <mat-card class="card summary-panel" *ngIf="selectedMentor() as mentor">
+      <h3>Session Summary</h3>
+      <div class="summary-mentor">
+        <span class="avatar-circle" [style.background]="avatarBg(mentor.name)">{{ initials(mentor.name) }}</span>
+        <div>
+          <strong>{{ mentor.name }}</strong>
+          <span class="muted">{{ mentor.experience }} experience</span>
+          <div class="star-rating"><mat-icon>star</mat-icon>{{ mentor.rating | number:'1.1-1' }}</div>
+        </div>
+      </div>
+
+      <div class="summary-rows">
+        <div class="summary-row">
+          <span>Date</span>
+          <strong>{{ firstFormGroup.value.date ? (firstFormGroup.value.date | date:'MMMM d, y') : '—' }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Time</span>
+          <strong>{{ secondFormGroup.value.time || '—' }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Duration</span>
+          <strong>{{ secondFormGroup.value.duration }} minutes</strong>
+        </div>
+        <div class="summary-row">
+          <span>Format</span>
+          <strong>Video Call</strong>
+        </div>
+        <div class="summary-row">
+          <span>Rate</span>
+          <strong>₹{{ mentor.hourlyRate }}/hr</strong>
+        </div>
+      </div>
+
+      <div class="summary-total">
+        <span>Total</span>
+        <strong>₹{{ estimatedTotal() }}</strong>
+      </div>
+    </mat-card>
   </div>
-</div>
+
+  <div class="section-block">
+    <div class="section-title">
+      <h3>Session History</h3>
+    </div>
+
+    <mat-card class="card history-item" *ngFor="let session of sessions()">
+      <div>
+        <strong>{{ session.sessionDate | date:'medium' }}</strong>
+        <p>Mentor #{{ session.mentorId }}</p>
+      </div>
+
+      <div class="history-right">
+        <span
+          class="badge"
+          [class.badge-success]="session.status === 'ACCEPTED' || session.status === 'COMPLETED'"
+          [class.badge-warning]="session.status === 'REQUESTED'"
+          [class.badge-danger]="session.status === 'REJECTED' || session.status === 'CANCELLED'">
+          {{ session.status | titlecase }}
+        </span>
+
+        <div class="session-actions">
+          <button mat-stroked-button *ngIf="session.status === 'REQUESTED' || session.status === 'ACCEPTED'" (click)="updateStatus(session, 'cancel')">Cancel</button>
+          <button mat-stroked-button *ngIf="session.status === 'ACCEPTED'" (click)="updateStatus(session, 'remind')">Remind</button>
+          <button mat-flat-button class="btn-primary-pill" *ngIf="session.status === 'ACCEPTED'" (click)="updateStatus(session, 'complete')">Mark complete</button>
+          <a mat-button [routerLink]="'/reviews'" [queryParams]="{ mentor: session.mentorId }" *ngIf="session.status === 'COMPLETED'">Review mentor</a>
+        </div>
+      </div>
+    </mat-card>
+
+    <p class="empty-state" *ngIf="!loading() && !sessions().length">No session requests yet.</p>
+  </div>
+</section>

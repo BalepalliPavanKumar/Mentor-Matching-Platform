@@ -1,58 +1,48 @@
-<div class="login-container">
-  <div class="split-panel">
-    <div class="brand-panel">
-      <div class="brand-content">
-        <h1 class="logo">Skill<span>Sync</span></h1>
-        <p class="tagline">Join our global community of learners and mentors.</p>
-      </div>
+<section class="register-screen">
+  <mat-card class="register-card">
+    <div class="register-copy">
+      <div class="hero-brand"><span class="brand-skill">Skill</span><span class="brand-sync">Sync</span></div>
+      <h1>Create your account</h1>
+      <span>
+        Join as a learner or mentor. Mentor onboarding and availability details get filled in after sign-up.
+      </span>
     </div>
 
-    <div class="form-panel">
-      <div class="login-box">
-        <h2>Create Account</h2>
-        <p class="subtitle">Start your journey today</p>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Full name</mat-label>
+        <input matInput formControlName="name" placeholder="Aarav Sharma">
+        <mat-icon matPrefix>person</mat-icon>
+      </mat-form-field>
 
-        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Full Name</mat-label>
-            <input matInput formControlName="name" placeholder="Pavan Kumar">
-            <mat-error *ngIf="registerForm.get('name')?.hasError('required')">Full Name is required</mat-error>
-          </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="aarav@example.com">
+        <mat-icon matPrefix>alternate_email</mat-icon>
+      </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email Address</mat-label>
-            <input matInput formControlName="email" type="email" placeholder="rahul.sharma@example.com">
-            <mat-error *ngIf="registerForm.get('email')?.hasError('required')">Email is required</mat-error>
-            <mat-error *ngIf="registerForm.get('email')?.hasError('email')">Invalid email address</mat-error>
-          </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" type="password" placeholder="Minimum 6 characters">
+        <mat-icon matPrefix>key</mat-icon>
+      </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" placeholder="••••••••••••">
-          </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Primary role</mat-label>
+        <mat-select formControlName="role">
+          <mat-option *ngFor="let role of roles" [value]="role.value">{{ role.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>I want to be a...</mat-label>
-            <mat-select formControlName="role">
-              <mat-option value="LEARNER">Learner</mat-option>
-              <mat-option value="MENTOR">Mentor</mat-option>
-            </mat-select>
-          </mat-form-field>
+      <button mat-flat-button class="btn-primary-pill submit-button" type="submit" [disabled]="registerForm.invalid || isSubmitting">
+        <mat-icon>{{ isSubmitting ? 'hourglass_top' : 'how_to_reg' }}</mat-icon>
+        {{ isSubmitting ? 'Creating account...' : 'Create account' }}
+      </button>
+    </form>
 
-          <div *ngIf="error" class="login-error">
-            {{ error }}
-          </div>
-
-          <button mat-flat-button color="primary" class="login-btn" type="submit" [disabled]="registerForm.invalid || isLoading">
-            <span *ngIf="!isLoading">SIGN UP →</span>
-            <span *ngIf="isLoading">CREATING ACCOUNT...</span>
-          </button>
-
-          <p class="register-prompt">
-            Already have an account? <a routerLink="/auth/login">Sign in</a>
-          </p>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+    <p class="switch-copy">
+      Already registered?
+      <a routerLink="/auth/login">Sign in</a>
+    </p>
+  </mat-card>
+</section>

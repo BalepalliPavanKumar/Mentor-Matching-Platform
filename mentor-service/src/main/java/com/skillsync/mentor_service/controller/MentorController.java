@@ -63,4 +63,10 @@ public class MentorController {
     public Mentor getById(@PathVariable Long id) {
         return mentorService.getMentorById(id);
     }
+
+    // GET: Fetch pending mentor applications for admin moderation
+    @GetMapping("/pending")
+    public List<Mentor> getPendingMentors() {
+        return mentorService.getMentorsByStatus("PENDING");
+    }
 }
