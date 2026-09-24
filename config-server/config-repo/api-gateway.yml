@@ -1,0 +1,97 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/users/**
+          filters:
+            - Authentication
+        - id: mentor-service
+          uri: lb://MENTOR-SERVICE
+          predicates:
+            - Path=/mentors/**
+          filters:
+            - Authentication
+        - id: skill-service
+          uri: lb://SKILL-SERVICE
+          predicates:
+            - Path=/skills/**
+          filters:
+            - Authentication
+        - id: session-service
+          uri: lb://SESSION-SERVICE
+          predicates:
+            - Path=/sessions/**
+          filters:
+            - Authentication
+        - id: group-service
+          uri: lb://GROUP-SERVICE
+          predicates:
+            - Path=/groups/**
+          filters:
+            - Authentication
+        - id: review-service
+          uri: lb://REVIEW-SERVICE
+          predicates:
+            - Path=/reviews/**
+          filters:
+            - Authentication
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notifications/**
+          filters:
+            - Authentication
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+              - "http://localhost:4300"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+jwt:
+  secret: ${JWT_SECRET:mysecretkeymysecretkeymysecretkey12} # Defaults for local, override in Docker
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: auth-service
+        url: /auth/v3/api-docs
+      - name: user-service
+        url: /users/v3/api-docs
+      - name: mentor-service
+        url: /mentors/v3/api-docs
+      - name: skill-service
+        url: /skills/v3/api-docs
+      - name: session-service
+        url: /sessions/v3/api-docs
+      - name: group-service
+        url: /groups/v3/api-docs
+      - name: review-service
+        url: /reviews/v3/api-docs
+      - name: notification-service
+        url: /notifications/v3/api-docs
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true

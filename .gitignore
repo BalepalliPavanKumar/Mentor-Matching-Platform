@@ -1,1 +1,28 @@
-/.metadata/
+# Build output
+target/
+dist/
+out/
+
+# Dependencies & local caches
+node_modules/
+.angular/
+.m2/
+
+# IDE / editor
+.metadata/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.factorypath
+.sts4-cache/
+.springBeans
+.DS_Store
+Thumbs.db
+
+# Logs & local env
+*.log
+.env
+*.token
+*_token.txt

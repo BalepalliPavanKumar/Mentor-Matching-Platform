@@ -8,7 +8,6 @@ SkillSync is a full-stack, cloud-native mentorship platform that connects learne
 
 ## Table of Contents
 
-- [Screenshots](#screenshots)
 - [Key Features](#key-features)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
@@ -23,22 +22,6 @@ SkillSync is a full-stack, cloud-native mentorship platform that connects learne
 - [Observability](#observability)
 - [Known Limitations & Next Steps](#known-limitations--next-steps)
 - [License](#license)
-
----
-
-## Screenshots
-
-| Login | Learner Dashboard |
-|---|---|
-| ![Login](docs/screenshots/login.png) | ![Dashboard](docs/screenshots/dashboard.png) |
-
-| Mentor Discovery | Session Booking |
-|---|---|
-| ![Mentors](docs/screenshots/mentors.png) | ![Sessions](docs/screenshots/sessions.png) |
-
-| Learning Groups | Admin Console |
-|---|---|
-| ![Groups](docs/screenshots/groups.png) | ![Admin](docs/screenshots/admin.png) |
 
 ---
 
@@ -103,7 +86,7 @@ Every business service registers itself with Eureka on startup and pulls its con
 | Framework | Spring Boot 3.2.6, Spring Cloud 2023.0.1 |
 | API Gateway | Spring Cloud Gateway (reactive, WebFlux) |
 | Service Discovery | Netflix Eureka |
-| Centralized Config | Spring Cloud Config Server (native/git-backed) |
+| Centralized Config | Spring Cloud Config Server (native, file-based) |
 | Messaging | RabbitMQ (Spring AMQP) |
 | Persistence | Spring Data JPA + PostgreSQL 15 (one database per service) |
 | Auth | JWT (jjwt), Spring Security |
@@ -140,7 +123,7 @@ Every business service registers itself with Eureka on startup and pulls its con
 | Service | Port | Responsibility |
 |---|---|---|
 | **service-registry** | 8761 | Eureka discovery server — every other service registers here |
-| **config-server** | 8888 | Serves centralized configuration from a git-backed repo (`config-server/config-repo`) |
+| **config-server** | 8888 | Serves centralized per-service configuration from `config-server/config-repo` |
 | **api-gateway** | 8080 | Single entry point; routes requests, validates JWTs, enforces role-based access |
 | **auth-service** | 8081 | Registration, login, JWT issuance/refresh |
 | **user-service** | 8084 | Learner/mentor/admin profile management |
@@ -296,7 +279,7 @@ Each service also exposes interactive **Swagger UI** at `http://localhost:<port>
 SkillSync-Platform/
 ├── api-gateway/            # Spring Cloud Gateway + JWT auth filter
 ├── auth-service/            # Registration, login, JWT issuance
-├── config-server/           # Centralized config (config-repo/ is a git submodule)
+├── config-server/           # Centralized config server; per-service config lives in config-repo/
 ├── group-service/           # Peer learning groups
 ├── mentor-service/          # Mentor applications, search, approval
 ├── notification-service/    # RabbitMQ event consumer
@@ -335,12 +318,10 @@ SkillSync-Platform/
 ### Run the full stack
 
 ```bash
-git clone --recurse-submodules https://github.com/BalepalliPavanKumar/SkillSync-Platform.git
+git clone https://github.com/BalepalliPavanKumar/SkillSync-Platform.git
 cd SkillSync-Platform
 docker compose up -d --build
 ```
-
-> `config-server/config-repo` is a **git submodule**. If you cloned without `--recurse-submodules`, run `git submodule update --init` before starting the stack, or `config-server` will boot with no configuration to serve.
 
 The first run builds all 11 backend services from source (Maven, inside Docker) plus the Angular frontend — this takes several minutes. Startup is healthcheck-gated: Postgres → database creation → Eureka → Config Server → API Gateway/business services → RabbitMQ-dependent services, so services won't come up half-configured.
 
@@ -361,10 +342,10 @@ Check status any time with `docker compose ps`, and tail logs for a specific ser
 ```bash
 cd frontend
 npm install
-npm start   # ng serve, http://localhost:4300
+npx ng serve --port 4300   # http://localhost:4300
 ```
 
-Requires the backend stack to be running separately (`docker compose up -d`, excluding `frontend`), since the Angular app talks to the gateway at `localhost:8080`.
+Port 4300 avoids clashing with the Dockerized frontend on 4200, and is already on the gateway's CORS allow-list. The backend stack still needs to be running (`docker compose up -d`), since the Angular app talks to the gateway at `localhost:8080`.
 
 ---
 
@@ -393,7 +374,6 @@ This project prioritizes demonstrating the microservices architecture, service c
 
 - **Password storage**: passwords are currently compared as plain text rather than hashed (e.g. BCrypt) — straightforward to add in `auth-service`.
 - **Notifications are simulated**: `notification-service` logs "would send email/push" rather than integrating a real provider (SendGrid, FCM, etc.) — the event-consumption plumbing is already in place, only the delivery integration is missing.
-- **No persistent Postgres volume by default in some setups**: ensure the `postgres-data` volume is retained across `docker compose down` if you want data to survive a restart.
 - **Frontend test coverage**: currently limited to the CLI-scaffolded root component test; guards, interceptors, the signal store, and feature components don't yet have dedicated specs.
 - **Inter-service validation**: services trust foreign-key-style IDs (e.g. `mentorId`, `userId`) passed in request bodies without a synchronous existence check against the owning service — acceptable for this scope, but a candidate for a shared validation layer or Feign-based checks at scale.
 
